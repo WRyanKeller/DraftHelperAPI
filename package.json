@@ -1,0 +1,18 @@
+{
+  "name": "draft-helper-api",
+  "version": "1.0.0",
+  "description": "An API deployed on Heroku using the Pokemon API to recommend a novice drafter some picks for their roster.",
+  "main": "./src/server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\""
+  },
+  "author": "Ryan Keller",
+  "license": "SEE LICENSE IN LICENSE",
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.28.1"
+  }
+}
