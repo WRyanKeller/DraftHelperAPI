@@ -17,6 +17,20 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
+const notFound = (request, response) => {
+  const responseJSON = {
+    message: 'The page you are looking for was not found.',
+    id: 'notFound'
+  };
+
+  respondJSON(request, response, 404, responseJSON);
+};
+
+const notFoundMeta = (request, response) => {
+  respondJSONMeta(request, response, 404);
+};
+
 module.exports = {
-    
+    notFound,
+    notFoundMeta
 }
