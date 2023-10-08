@@ -6,7 +6,7 @@ const config = {
     entry: './client/client.js',
     mode: 'development',
     output: {
-        path: path.resolve(__dirname, 'hosted'),
+        path: path.resolve(__dirname, 'bundle'),
         filename: 'bundle.js'
     },
     watchOptions: {

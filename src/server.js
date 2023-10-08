@@ -10,11 +10,11 @@ const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getCSS,
-    '/getUsers': jsonHandler.getUsers,
+    '/getRoster': jsonHandler.getRoster,
     notFound: jsonHandler.notFound
   },
   HEAD: {
-    '/getUsers': jsonHandler.getUsersMeta,
+    '/getRoster': jsonHandler.getRosterMeta,
     notFound: jsonHandler.notFoundMeta
   }
 };
@@ -41,8 +41,8 @@ const parseBody = (request, response, handler) => {
 };
 
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addUser') {
-    parseBody(request, response, jsonHandler.addUser);
+  if (parsedUrl.pathname === '/addRoster') {
+    parseBody(request, response, jsonHandler.addRoster);
   }
 };
 
@@ -67,6 +67,7 @@ const onRequest = (request, response) => {
   }
 
   const params = query.parse(parsedUrl.query);
+  console.dir(params);
   return handleGet(request, response, parsedUrl, params);
 };
 
