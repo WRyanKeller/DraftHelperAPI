@@ -3,7 +3,7 @@
 const path = require('path');
 
 const config = {
-    entry: './src/server.js',
+    entry: './client/client.js',
     mode: 'development',
     output: {
         path: path.resolve(__dirname, 'hosted'),

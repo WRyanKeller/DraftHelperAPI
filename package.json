@@ -6,8 +6,11 @@
   "scripts": {
     "start": "node ./src/server.js",
     "pretest": "eslint ./src --fix",
-    "nodemon": "nodemon --watch ./src --watch ./client --watch ./hosted ./src/server.js",
-    "test": "echo \"Tests complete\""
+    "test": "echo \"Tests complete\"",
+    "nodemon": "nodemon -e js,html,css --watch ./src --watch ./client --watch ./hosted ./src/server.js",
+    "buildBundle": "webpack",
+    "watchBundle": "webpack watch",
+    "heroku-postbuild": "webpack --mode production"
   },
   "author": "Ryan Keller",
   "license": "SEE LICENSE IN LICENSE",
