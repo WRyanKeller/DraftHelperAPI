@@ -1,7 +1,9 @@
 const fs = require('fs');
+const { request } = require('http');
 
 const index = fs.readFileSync(`${__dirname}/../hosted/client.html`);
 const css = fs.readFileSync(`${__dirname}/../hosted/style.css`);
+const bundle = fs.readFileSync(`${__dirname}/../bundle/bundle.js`);
 
 const getIndex = (request, response) => {
   response.writeHead(200, { 'Content-Type': 'text/html' });
@@ -15,7 +17,14 @@ const getCSS = (request, response) => {
   response.end();
 };
 
+const getBundle = (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'text/css' });
+  response.write(bundle);
+  response.end();
+}
+
 module.exports = {
   getIndex,
-  getCSS
+  getCSS,
+  getBundle
 };

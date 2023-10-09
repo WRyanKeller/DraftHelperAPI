@@ -8,16 +8,28 @@
 
 <body>
   <header>
-
+    <h1>Draft Helper API</h1>
   </header>
-  
-  <h1>meow!!! its the pokemon thing!!!</h1>
 
   <div id="input">
-
+    <form id="rosterForm">
+      <label for="rosterID">Roster ID: </label>
+      <input id="nameField" type="text" name="rosterID"/>
+      <select id="methodSelect">
+        <option action="/getRoster" method="get">Load</option>
+        <option action="/addRoster" method="post">Save</option>
+      </select>
+      <input type="submit" value="Submit"/>
+    </form>
+    <p id="rosterResponse"></p>
   </div>
 
-  <div id="roster"></div>
+  <br>
+
+  <div id="roster">
+    <h2>Roster:</h2>
+    <p id="tempRoster"></p>
+  </div>
 
   <div id="conerns"></div>
 
