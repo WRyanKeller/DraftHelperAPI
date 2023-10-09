@@ -1,0 +1,61 @@
++--------------------------+
+|                          |
+|     Draft Helper API     |
+|                          |
++--------------------------+
+
+Author: Ryan Keller
+
+Intended Purpose:
+The purpose of the draft helper api is to load and store your pokemon rosters
+as well as identify and suggest solutions for any potential weaknesses on the team
+using the Pokemon API.
+
+Data:
+The data stored by the application consists of rosters under user-designated roster ids.
+Rosters consist of an array of pokemon, and are themselves held in an object with a key
+corresponding to their roster id.
+
+Completion:
+Currently, the project is able to load rosters and handle most relevant response codes from the client.
+There is also progress done on validating the names of different pokemon with the Pokemon API before storing them,
+as well as adding / updating rosters.
+
+To-Do:
+In order to meet the base requirements, adding new rosters as well as editing old ones needs to be completed.
+This will involve validating added pokemon on the backend and creating an editing interface on the front end.
+All additional work will be completing the extra features.
+
+Extra Features:
+Using the Pokemon API, the roster can be tested for the presence of strong attackers, strong defenders, and strong utility.
+Lacking in stats, hazard removal, pivot, or speed tiers can be a nail in the coffin against an enemy, so
+the goal is to have it notify you of these shortcomings and possibly suggest an addition to the team.
+
+Code Fragments:
+client.js - https://www.codexworld.com/how-to/get-attribute-value-of-the-selected-option-using-javascript/
+ - used to get attributes other than value from the current option of a select tag
+
+-----------------------
+Endpoint Documentation:
+-----------------------
+
+(WIP in parenthesis)
+
+URL: /getRoster
+Supported Methods: GET (HEAD)
+Query Params: id (roster id of the desired roster)
+Description: Fetches a specific roster
+Return Type(s): JSON
+
+URL: /addRoster
+Supported Methods: (POST)
+Body: A roster id followed by a space or underscore separated list of pokemon as a string
+Description: Stores a roster with the current roster id
+Return Type(s): JSON
+
+URL: (/analyzeRoster)
+Supported Methods: (GET)
+Query Params: id (roster id of the desired roster)
+Description: Returns an object with key-value pairs relating to specific weaknesses, with the
+    last key-value as an object that holds recommended pokemon and descriptions of why
+Return Type(s): JSON
