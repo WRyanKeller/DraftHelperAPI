@@ -1,3 +1,5 @@
+let rosterStr = "";
+
 const handleResponse = async (id, response, parseResponse) => {
   const rosterResponse = document.getElementById(id);
 
@@ -32,6 +34,7 @@ const handleResponse = async (id, response, parseResponse) => {
 
     if (obj.roster) {
       let roster = JSON.stringify(obj.roster);
+      rosterStr = roster;
       document.getElementById('tempRoster').innerHTML = `<p>${roster}</p>`;
     }
   }
@@ -48,34 +51,27 @@ const sendFetch = async (action) => {
   handleResponse('rosterResponse', response, true);
 };
 
-const sendPost = async (nameForm) => {
-  const nameAction = nameForm.getAttribute('action');
-  const nameMethod = nameForm.getAttribute('method');
-
-  const nameField = nameForm.querySelector('#nameField');
-  const ageField = nameForm.querySelector('#ageField');
-
-  const formData = `name=${nameField.value}&age=${ageField.value}`;
-
-  let response = await fetch(nameAction, {
-    method: nameMethod,
+const sendPost = async (action, body) => {
+  let response = await fetch(action, {
+    method: 'post',
     headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
     'Accept': 'application/json',
     },
-    body: formData,
+    body: body,
   });
 
-  handleResponse(response, true);
+  handleResponse('rosterResponse', response, true);
 };
 
 const handleRoster = (rosterForm) => {
-    const select = rosterForm.querySelector('select');
-    const action = select.options[select.selectedIndex].getAttribute('action');
-    const method = select.options[select.selectedIndex].getAttribute('method');
+  const select = rosterForm.querySelector('select');
+  const action = select.options[select.selectedIndex].getAttribute('action');
+  const method = select.options[select.selectedIndex].getAttribute('method');
 
-    //console.log(`action: ${action}, method: ${method}`);
-    if (method === 'get') sendFetch(action + `?id=${document.getElementById('nameField').value}`);
+  //console.log(`action: ${action}, method: ${method}`);
+  if (method === 'get') sendFetch(action + `?id=${document.getElementById('idField').value}`);
+  else sendPost(action, `id: ${document.getElementById('idField').value}, roster: ${rosterStr}`);
 };
 
 const init = () => {

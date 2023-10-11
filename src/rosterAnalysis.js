@@ -16,9 +16,9 @@ const validateRoster = (roster) => {
     message: 'Roster is valid!',
   };
 
-  roster.array.forEach((mon) => {
+  roster.forEach((mon) => {
     monResult = getMon(mon);
-    if (!monResult.abilities) {
+    if (!monResult.abilities && returnObj.pass) {
       returnObj.pass = false;
       returnObj.message = monResult;
     }
