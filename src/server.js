@@ -12,12 +12,12 @@ const urlStruct = {
     '/style.css': htmlHandler.getCSS,
     '/bundle.js': htmlHandler.getBundle,
     '/getRoster': jsonHandler.getRoster,
-    notFound: jsonHandler.notFound
+    notFound: jsonHandler.notFound,
   },
   HEAD: {
     '/getRoster': jsonHandler.getRosterMeta,
-    notFound: jsonHandler.notFoundMeta
-  }
+    notFound: jsonHandler.notFoundMeta,
+  },
 };
 
 const parseBody = (request, response, handler) => {
@@ -51,8 +51,8 @@ const handleGet = (request, response, parsedUrl, params) => {
   if (urlStruct[request.method][parsedUrl.pathname]) {
     return urlStruct[request.method][parsedUrl.pathname](request, response, params);
   }
-      
-  return urlStruct[request.method]['notFound'](request, response, params);
+
+  return urlStruct[request.method].notFound(request, response, params);
 };
 
 const onRequest = (request, response) => {

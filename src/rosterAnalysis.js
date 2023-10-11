@@ -1,30 +1,32 @@
-const apiURL = "https://pokeapi.co/api/v2/";
-
-const validateRoster = (roster) => {
-let monResult;
-
-  for (mon of roster) {
-    monResult = getMon(mon);
-    if(!monResult.abilities) {
-      return {
-        pass: false,
-        message: monResult
-      };
-    }
-  }
-
-  return {pass: true};
-};
+const apiURL = 'https://pokeapi.co/api/v2/';
 
 const getMon = (mon) => {
-  let monResult = fetch(apiURL + mon);
+  const monResult = fetch(apiURL + mon);
 
-  monResult.then(response => {
-    if (monResult) return monResult;
-    return mon + " does not exist or is in the wrong format!";
+  monResult.then((response) => {
+    if (response) return response;
+    return `${mon} does not exist or is in the wrong format!`;
   });
 };
 
+const validateRoster = (roster) => {
+  let monResult;
+  const returnObj = {
+    pass: true,
+    message: 'Roster is valid!',
+  };
+
+  roster.array.forEach((mon) => {
+    monResult = getMon(mon);
+    if (!monResult.abilities) {
+      returnObj.pass = false;
+      returnObj.message = monResult;
+    }
+  });
+
+  return returnObj;
+};
+
 module.exports = {
-  validateRoster
+  validateRoster,
 };

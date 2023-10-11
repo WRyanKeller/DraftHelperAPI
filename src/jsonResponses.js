@@ -1,15 +1,15 @@
-const rosterAnalysis = require("./rosterAnalysis.js")
+const rosterAnalysis = require('./rosterAnalysis.js');
 
 const rosters = {
-  sarah_rc: ["genesect",
-    "rotom-wash",
-    "sylveon"
-  ]
+  sarah_rc: ['genesect',
+    'rotom-wash',
+    'sylveon',
+  ],
 };
 
 const respondJSON = (request, response, status, object) => {
   const headers = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   };
 
   response.writeHead(status, headers);
@@ -19,7 +19,7 @@ const respondJSON = (request, response, status, object) => {
 
 const respondJSONMeta = (request, response, status) => {
   const headers = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   };
 
   response.writeHead(status, headers);
@@ -28,7 +28,7 @@ const respondJSONMeta = (request, response, status) => {
 
 const getRoster = (request, response, params) => {
   const responseJSON = {
-    roster: rosters[params.id]
+    roster: rosters[params.id],
   };
 
   return respondJSON(request, response, 200, responseJSON);
@@ -37,12 +37,12 @@ const getRoster = (request, response, params) => {
 const getRosterMeta = (request, response) => respondJSONMeta(request, response, 200);
 
 const addRoster = (request, response, body) => {
-  rosterValid = rosterAnalysis.validateRoster(body.roster);
+  const rosterValid = rosterAnalysis.validateRoster(body.roster);
 
   if (!rosterValid.pass) {
     const responseJSON = {
       message: rosterValid.message,
-      id: 'invalidMonName'
+      id: 'invalidMonName',
     };
     return respondJSON(request, response, 400, responseJSON);
   }
@@ -51,7 +51,7 @@ const addRoster = (request, response, body) => {
     rosters[body.id] = body.roster;
     return respondJSONMeta(request, response, 204);
   }
-  
+
   rosters[body.id] = body.roster;
   const responseJSON = {
     message: 'Created Successfully',
@@ -62,7 +62,7 @@ const addRoster = (request, response, body) => {
 const notFound = (request, response) => {
   const responseJSON = {
     message: 'The page you are looking for was not found.',
-    id: 'notFound'
+    id: 'notFound',
   };
 
   respondJSON(request, response, 404, responseJSON);
@@ -77,5 +77,5 @@ module.exports = {
   getRosterMeta,
   addRoster,
   notFound,
-  notFoundMeta
+  notFoundMeta,
 };
