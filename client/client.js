@@ -19,6 +19,9 @@ const handleResponse = async (id, response, parseResponse) => {
     case 404: //not found
       rosterResponse.innerHTML = `<b>Not Found</b>`;
       break;
+    case 500: //uh oh
+      rosterResponse.innerHTML = `<b>Internal Server Error</b>`;
+      break;
     default: //any other status code
       rosterResponse.innerHTML = `Error code not implemented by client.`;
       break;

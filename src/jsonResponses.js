@@ -40,6 +40,13 @@ const addRoster = (request, response, body) => {
   const rosterResponse = rosterAnalysis.validateRoster(body.roster);
 
   rosterResponse.then((rosterValid) => {
+    if (!rosterValid.message) {
+      const responseJSON = {
+        message: rosterValid.message,
+        id: 'validationSeverError',
+      };
+      return respondJSON(request, response, 500, responseJSON);
+    }
     if (!rosterValid.pass) {
       const responseJSON = {
         message: rosterValid.message,
