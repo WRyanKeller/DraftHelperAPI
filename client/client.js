@@ -71,7 +71,7 @@ const handleRoster = (rosterForm) => {
 
   //console.log(`action: ${action}, method: ${method}`);
   if (method === 'get') sendFetch(action + `?id=${document.getElementById('idField').value}`);
-  else sendPost(action, `id: ${document.getElementById('idField').value}, roster: ${rosterStr}`);
+  else sendPost(action, `id=${document.getElementById('idField').value}&roster=${rosterStr}`);
 };
 
 const init = () => {

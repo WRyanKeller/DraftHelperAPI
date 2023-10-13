@@ -1,16 +1,15 @@
 const apiURL = 'https://pokeapi.co/api/v2/';
 
-const getMon = (mon) => {
-  const monResult = fetch(apiURL + mon);
+const getMon = async (mon) => {
+  const monResult = await fetch(apiURL + mon);
 
-  monResult.then((response) => {
-    if (response) return response;
-    return `${mon} does not exist or is in the wrong format!`;
-  });
+  if (monResult) return monResult;
+  return `${mon} does not exist or is in the wrong format!`;
 };
 
-const validateRoster = (roster) => {
+const validateRoster = async (roster) => {
   let monResult;
+  let resultCount = 0;
   const returnObj = {
     pass: true,
     message: 'Roster is valid!',
@@ -18,10 +17,13 @@ const validateRoster = (roster) => {
 
   roster.forEach((mon) => {
     monResult = getMon(mon);
-    if (!monResult.abilities && returnObj.pass) {
-      returnObj.pass = false;
-      returnObj.message = monResult;
-    }
+
+    monResult.then((response) => {
+      if (!monResult.abilities && returnObj.pass) {
+        returnObj.pass = false;
+        returnObj.message = monResult;
+      }
+    });
   });
 
   return returnObj;

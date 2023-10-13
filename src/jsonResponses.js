@@ -37,26 +37,28 @@ const getRoster = (request, response, params) => {
 const getRosterMeta = (request, response) => respondJSONMeta(request, response, 200);
 
 const addRoster = (request, response, body) => {
-  const rosterValid = rosterAnalysis.validateRoster(body.roster);
+  const rosterResponse = rosterAnalysis.validateRoster(body.roster);
 
-  if (!rosterValid.pass) {
-    const responseJSON = {
-      message: rosterValid.message,
-      id: 'invalidMonName',
-    };
-    return respondJSON(request, response, 400, responseJSON);
-  }
+  rosterResponse.then((rosterValid) => {
+    if (!rosterValid.pass) {
+      const responseJSON = {
+        message: rosterValid.message,
+        id: 'invalidMonName',
+      };
+      return respondJSON(request, response, 400, responseJSON);
+    }
 
-  if (rosters[body.id]) {
+    if (rosters[body.id]) {
+      rosters[body.id] = body.roster;
+      return respondJSONMeta(request, response, 204);
+    }
+
     rosters[body.id] = body.roster;
-    return respondJSONMeta(request, response, 204);
-  }
-
-  rosters[body.id] = body.roster;
-  const responseJSON = {
-    message: 'Created Successfully',
-  };
-  return respondJSON(request, response, 201, responseJSON);
+    const responseJSON = {
+      message: 'Created Successfully',
+    };
+    return respondJSON(request, response, 201, responseJSON);
+  });
 };
 
 const notFound = (request, response) => {
