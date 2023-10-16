@@ -31,6 +31,10 @@ const getRoster = (request, response, params) => {
     roster: rosters[params.id],
   };
 
+  if (!responseJSON.roster) {
+    responseJSON.roster = 'empty';
+  }
+
   return respondJSON(request, response, 200, responseJSON);
 };
 

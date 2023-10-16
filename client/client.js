@@ -36,9 +36,22 @@ const handleResponse = async (id, response, parseResponse) => {
     }
 
     if (obj.roster) {
-      let roster = JSON.stringify(obj.roster);
-      rosterStr = roster;
-      document.getElementById('tempRoster').innerHTML = `<p>${roster}</p>`;
+      let roster = '';
+      if (obj.roster === 'empty') {
+        rosterStr = roster;
+        return;
+      }
+
+      roster = JSON.stringify(obj.roster);
+
+      const rosterDiv = document.createElement('div');
+      let htmlStr = '';
+        
+      for (mon of obj.roster) {
+        htmlStr += `<h3>${mon}</h3>`;
+      }
+
+      document.getElementById('tempRoster').innerHTML = htmlStr;
     }
   }
 };

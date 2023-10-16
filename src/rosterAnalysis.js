@@ -1,7 +1,7 @@
 const apiURL = 'https://pokeapi.co/api/v2/';
 
 const getMon = async (mon) => {
-  const monResult = await fetch(`${apiURL}${mon}`, {
+  const monResult = await fetch(`${apiURL}pokemon/${mon}`, {
     method: 'get',
     headers: {
     'Accept': 'application/json',
@@ -26,7 +26,8 @@ const validateRoster = async (roster) => {
     let monResult = getMon(mon);
 
     monResult.then((response) => {
-      if (!monResult.abilities && returnObj.pass) {
+      if (!response.abilities && returnObj.pass) {
+        console.log(response.abilities);
         returnObj.pass = false;
         returnObj.message = response;
       }
