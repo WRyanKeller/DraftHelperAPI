@@ -37,7 +37,7 @@ const parseBody = (request, response, handler) => {
     const bodyString = Buffer.concat(body).toString();
     const bodyParams = query.parse(bodyString);
 
-    if(bodyParams.roster) {
+    if (bodyParams.roster) {
       bodyParams.roster = JSON.parse(bodyParams.roster);
     }
     handler(request, response, bodyParams);

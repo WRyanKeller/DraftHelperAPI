@@ -4,11 +4,11 @@ const getMon = async (mon) => {
   const monResult = await fetch(`${apiURL}pokemon/${mon}`, {
     method: 'get',
     headers: {
-    'Accept': 'application/json',
-    }
+      Accept: 'application/json',
+    },
   });
 
-  let monJson = monResult.json();
+  const monJson = monResult.json();
 
   if (monJson) return monJson;
   return `${mon} does not exist or is in the wrong format!`;
@@ -16,14 +16,13 @@ const getMon = async (mon) => {
 
 const validateRoster = async (roster) => {
   const monPromises = [];
-  let resultCount = 0;
   const returnObj = {
     pass: true,
     message: 'Roster is valid!',
   };
 
   roster.forEach((mon) => {
-    let monResult = getMon(mon);
+    const monResult = getMon(mon);
 
     monResult.then((response) => {
       if (!response.abilities && returnObj.pass) {
