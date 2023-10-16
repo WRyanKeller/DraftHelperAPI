@@ -1,6 +1,6 @@
 let rosterStr = "";
 
-const handleResponse = async (id, response, parseResponse) => {
+const handleResponse = async (id, response, parseResponse, handlers) => {
   const rosterResponse = document.getElementById(id);
 
   switch(response.status) {
@@ -54,9 +54,18 @@ const handleResponse = async (id, response, parseResponse) => {
       document.getElementById('tempRoster').innerHTML = htmlStr;
     }
   }
+  else {
+    for (handler of handlers) {
+      handler.function(response, handler.data);
+    }
+  }
 };
 
-const sendFetch = async (action) => {
+const updateText = (response, id) => {
+
+}
+
+const sendFetch = async (action, handlers) => {
   let response = await fetch(action, {
     method: 'get',
     headers: {
@@ -64,10 +73,10 @@ const sendFetch = async (action) => {
     }
   });
 
-  handleResponse('rosterResponse', response, true);
+  handleResponse('rosterResponse', response, true, handlers);
 };
 
-const sendPost = async (action, body) => {
+const sendPost = async (action, body, handlers) => {
   let response = await fetch(action, {
     method: 'post',
     headers: {
@@ -77,7 +86,7 @@ const sendPost = async (action, body) => {
     body: body,
   });
 
-  handleResponse('rosterResponse', response, true);
+  handleResponse('rosterResponse', response, true, handlers);
 };
 
 const handleRoster = (rosterForm) => {
@@ -86,8 +95,8 @@ const handleRoster = (rosterForm) => {
   const method = select.options[select.selectedIndex].getAttribute('method');
 
   //console.log(`action: ${action}, method: ${method}`);
-  if (method === 'get') sendFetch(action + `?id=${document.getElementById('idField').value}`);
-  else sendPost(action, `id=${document.getElementById('idField').value}&roster=${rosterStr}`);
+  if (method === 'get') sendFetch(action + `?id=${document.getElementById('idField').value}`, {});
+  else sendPost(action, `id=${document.getElementById('idField').value}&roster=${rosterStr}`, {});
 };
 
 const init = () => {
