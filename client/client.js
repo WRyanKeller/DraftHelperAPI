@@ -1,4 +1,5 @@
 let rosterStr = "";
+let rosterId = "";
 
 const handleResponse = async (response, parseResponse, handlers) => {
   /*
@@ -48,15 +49,15 @@ const handleResponse = async (response, parseResponse, handlers) => {
   }
 };
 
-const sendFetch = async (action, handlers) => {
+const sendFetch = async (action, handlers, shouldParse=true, type='application/json') => {
   let response = await fetch(action, {
     method: 'get',
     headers: {
-    'Accept': 'application/json',
+      'Accept': type,
     }
   });
 
-  handleResponse(response, true, handlers);
+  handleResponse(response, shouldParse, handlers);
 };
 
 const sendPost = async (action, body, handlers) => {
@@ -84,6 +85,14 @@ const updateTextFromJSON = (obj, id) => {
   updateText(obj.message, id);
 }
 
+const removeMon = (monElement) => {
+
+};
+
+const removeMonHandler = (obj, monElement) => {
+  removeMon(monElement);
+};
+
 const addMon = (mon) => {
   const monElement = document.createElement('div');
   monElement.setAttribute('class', 'mon');
@@ -92,20 +101,27 @@ const addMon = (mon) => {
   monHeader.setAttribute('class', 'monHeader');
   monHeader.innerHTML = mon;
 
+  const monArt = document.createElement('image');
+  monArt.setAttribute('src', `getArt?mon=${mon}`);
+  monArt.setAttribute('alt', `Art of ${mon}`);
+
   const monDelete = document.createElement('button');
   monDelete.setAttribute('class', 'monDelete');
   monDelete.setAttribute('type', 'button');
   monHeader.innerHTML = 'x';
   monDelete.addEventListener('click', e => {
-
+    return sendPost('removeMon', `?mon=${mon}&id=${rosterId}`,
+    [{removeMonHandler}
+    ]);
   });
 
-  // promise to add image later
-  const monArt = document.create
+  monElement.appendChild(monHeader);
+  monElement.appendChild(monArt);
+  monElement.appendChild(monDelete);
 };
 
-const addMonHandler = (obj, mon) => {
-  if (obj.id) {
+const addMonHandler = (obj, mon, response) => {
+  if (response.status != 204) {
     return;
   }
 
