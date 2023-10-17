@@ -1,8 +1,7 @@
 let rosterStr = "";
 
-const handleResponse = async (id, response, parseResponse, handlers) => {
-  const rosterResponse = document.getElementById(id);
-
+const handleResponse = async (response, parseResponse, handlers) => {
+  /*
   switch(response.status) {
     case 200: //success
       rosterResponse.innerHTML = `<b>Success</b>`;
@@ -26,32 +25,20 @@ const handleResponse = async (id, response, parseResponse, handlers) => {
       rosterResponse.innerHTML = `Error code not implemented by client.`;
       break;
   }
+  */
 
   if (parseResponse) {
-    let obj = await response.json();
+    let obj = {};
+    if (response.status === 204) {
+      obj.message = 'Success - Updated'
+    } else {
+      obj = await response.json();
+    }
+    
     console.log(obj);
 
-    if(obj.message) {
-      rosterResponse.innerHTML += `<p>Message: ${obj.message}</p>`;
-    }
-
-    if (obj.roster) {
-      let roster = '';
-      if (obj.roster === 'empty') {
-        rosterStr = roster;
-        return;
-      }
-
-      roster = JSON.stringify(obj.roster);
-
-      const rosterDiv = document.createElement('div');
-      let htmlStr = '';
-        
-      for (mon of obj.roster) {
-        htmlStr += `<h3>${mon}</h3>`;
-      }
-
-      document.getElementById('tempRoster').innerHTML = htmlStr;
+    for (handler of handlers) {
+      handler.function(obj, handler.data, response);
     }
   }
   else {
@@ -61,8 +48,35 @@ const handleResponse = async (id, response, parseResponse, handlers) => {
   }
 };
 
-const updateText = (response, id) => {
+// requires string id of html element
+const updateText = (message, id) => {
+  const responseElement = document.getElementById(id);
 
+  responseElement.innerHTML = message;
+}
+
+// requires string id of html element
+const updateTextFromJSON = (obj, id) => {
+  updateText(obj.message, id);
+}
+
+const updateRoster = (obj) => {
+  let roster = '';
+  if (!(obj.roster)) {
+    rosterStr = roster;
+    return;
+  }
+
+  roster = JSON.stringify(obj.roster);
+
+  const rosterDiv = document.createElement('div');
+  let htmlStr = '';
+    
+  for (mon of obj.roster) {
+    htmlStr += `<h3>${mon}</h3>`;
+  }
+
+  document.getElementById('tempRoster').innerHTML = htmlStr;
 }
 
 const sendFetch = async (action, handlers) => {
@@ -73,7 +87,7 @@ const sendFetch = async (action, handlers) => {
     }
   });
 
-  handleResponse('rosterResponse', response, true, handlers);
+  handleResponse(response, true, handlers);
 };
 
 const sendPost = async (action, body, handlers) => {
@@ -86,7 +100,7 @@ const sendPost = async (action, body, handlers) => {
     body: body,
   });
 
-  handleResponse('rosterResponse', response, true, handlers);
+  handleResponse(response, true, handlers);
 };
 
 const handleRoster = (rosterForm) => {
@@ -95,8 +109,17 @@ const handleRoster = (rosterForm) => {
   const method = select.options[select.selectedIndex].getAttribute('method');
 
   //console.log(`action: ${action}, method: ${method}`);
-  if (method === 'get') sendFetch(action + `?id=${document.getElementById('idField').value}`, {});
-  else sendPost(action, `id=${document.getElementById('idField').value}&roster=${rosterStr}`, {});
+  if (method === 'get') sendFetch(action + `?id=${document.getElementById('idField').value}`, [{
+      function: updateTextFromJSON,
+      data: 'rosterResponse'
+    }, {
+      function: updateRoster,
+      data: ''
+    }]);
+  else sendPost(action, `id=${document.getElementById('idField').value}&roster=${rosterStr}`, [{
+    function: updateTextFromJSON,
+    data: 'rosterResponse'
+  }]);
 };
 
 const init = () => {

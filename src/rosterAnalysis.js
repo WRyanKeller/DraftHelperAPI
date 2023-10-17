@@ -14,6 +14,22 @@ const getMon = async (mon) => {
   return `${mon} does not exist or is in the wrong format!`;
 };
 
+const validateMon = async (mon) => {
+  const returnObj = {
+    pass: true,
+    message: `${mon} added successfully`,
+  };
+
+  const monResult = await getMon(mon);
+
+  if (!monResult.abilities) {
+    returnObj.pass = false;
+    returnObj.message = monResult;
+  }
+
+  return returnObj;
+};
+
 const validateRoster = async (roster) => {
   const monPromises = [];
   const returnObj = {
@@ -42,4 +58,5 @@ const validateRoster = async (roster) => {
 
 module.exports = {
   validateRoster,
+  validateMon,
 };
