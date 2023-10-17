@@ -1,3 +1,25 @@
 header {
     text-align: center;
 }
+
+.mon {
+    display: grid;
+    grid-template-rows: 475px 40px;
+    grid-template-columns: auto 475px;
+    grid-template-areas: 
+        "title" "delete"
+        "image" "delete";
+}
+
+.monHeader {
+    grid-area: title;
+}
+
+.monArt {
+    grid-area: image;
+}
+
+.monDelete {
+    grid-area: delete;
+    align-self: center;
+}

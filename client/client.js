@@ -48,37 +48,6 @@ const handleResponse = async (response, parseResponse, handlers) => {
   }
 };
 
-// requires string id of html element
-const updateText = (message, id) => {
-  const responseElement = document.getElementById(id);
-
-  responseElement.innerHTML = message;
-}
-
-// requires string id of html element
-const updateTextFromJSON = (obj, id) => {
-  updateText(obj.message, id);
-}
-
-const updateRoster = (obj) => {
-  let roster = '';
-  if (!(obj.roster)) {
-    rosterStr = roster;
-    return;
-  }
-
-  roster = JSON.stringify(obj.roster);
-
-  const rosterDiv = document.createElement('div');
-  let htmlStr = '';
-    
-  for (mon of obj.roster) {
-    htmlStr += `<h3>${mon}</h3>`;
-  }
-
-  document.getElementById('tempRoster').innerHTML = htmlStr;
-}
-
 const sendFetch = async (action, handlers) => {
   let response = await fetch(action, {
     method: 'get',
@@ -103,6 +72,64 @@ const sendPost = async (action, body, handlers) => {
   handleResponse(response, true, handlers);
 };
 
+// requires string id of html element
+const updateText = (message, id) => {
+  const responseElement = document.getElementById(id);
+
+  responseElement.innerHTML = message;
+}
+
+// requires string id of html element
+const updateTextFromJSON = (obj, id) => {
+  updateText(obj.message, id);
+}
+
+const addMon = (mon) => {
+  const monElement = document.createElement('div');
+  monElement.setAttribute('class', 'mon');
+
+  const monHeader = document.createElement('h3');
+  monHeader.setAttribute('class', 'monHeader');
+  monHeader.innerHTML = mon;
+
+  const monDelete = document.createElement('button');
+  monDelete.setAttribute('class', 'monDelete');
+  monDelete.setAttribute('type', 'button');
+  monHeader.innerHTML = 'x';
+  monDelete.addEventListener('click', e => {
+
+  });
+
+  // promise to add image later
+  const monArt = document.create
+};
+
+const addMonHandler = (obj, mon) => {
+  if (obj.id) {
+    return;
+  }
+
+  return addMon(mon);
+};
+
+const updateRoster = (obj) => {
+  let roster = '';
+  if (!(obj.roster)) {
+    rosterStr = roster;
+    return;
+  }
+
+  roster = JSON.stringify(obj.roster);
+
+  let htmlStr = '';
+    
+  for (mon of obj.roster) {
+    htmlStr += `<h3>${mon}</h3>`;
+  }
+
+  document.getElementById('tempRoster').innerHTML = htmlStr;
+}
+
 const handleRoster = (rosterForm) => {
   const select = rosterForm.querySelector('select');
   const action = select.options[select.selectedIndex].getAttribute('action');
@@ -121,6 +148,10 @@ const handleRoster = (rosterForm) => {
     data: 'rosterResponse'
   }]);
 };
+
+const addMonToRoster = (monForm) => {
+
+}
 
 const init = () => {
   const rosterForm = document.querySelector('#rosterForm');

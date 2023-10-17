@@ -18,6 +18,12 @@ const urlStruct = {
     '/getRoster': jsonHandler.getRosterMeta,
     notFound: jsonHandler.notFoundMeta,
   },
+  POST: {
+    '/addRoster': jsonHandler.addRoster,
+    '/addMon': jsonHandler.addMon,
+    '/removeMon': jsonHandler.removeMon,
+    notFound: jsonHandler.notFound,
+  },
 };
 
 const parseBody = (request, response, handler) => {
@@ -45,9 +51,11 @@ const parseBody = (request, response, handler) => {
 };
 
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addRoster') {
-    parseBody(request, response, jsonHandler.addRoster);
+  if (urlStruct.POST[parsedUrl.pathname]) {
+    return parseBody(request, response, urlStruct.POST[parsedUrl.pathname]);
   }
+
+  return urlStruct.POST.notFound(request, response);
 };
 
 const handleGet = (request, response, parsedUrl, params) => {
