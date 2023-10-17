@@ -46,7 +46,7 @@ const parseBody = (request, response, handler) => {
     if (bodyParams.roster) {
       bodyParams.roster = JSON.parse(bodyParams.roster);
     }
-    handler(request, response, bodyParams);
+    return handler(request, response, bodyParams);
   });
 };
 

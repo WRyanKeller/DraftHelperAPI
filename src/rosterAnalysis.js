@@ -8,10 +8,15 @@ const getMon = async (mon) => {
     },
   });
 
-  const monJson = monResult.json();
+  let monResponse = '';
 
-  if (monJson) return monJson;
-  return `${mon} does not exist or is in the wrong format!`;
+  try {
+    monResponse = await monResult.json();
+  } catch {
+    monResponse = `${mon} does not exist or is in the wrong format!`;
+  }
+
+  return monResponse;
 };
 
 const validateMon = async (mon) => {

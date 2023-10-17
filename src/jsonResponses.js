@@ -155,10 +155,13 @@ const removeMonFromRoster = (request, response, body) => {
     return respondJSON(request, response, 404, responseJSON);
   }
 
-  if (rosters[body.id].splice(body.mon) === -1) {
+  let index = rosters[body.id].indexOf(body.mon);
+
+  if (index === -1) {
     return respondJSON(request, response, 404, responseJSON);
   }
 
+  rosters[body.id].splice(index, 1);
   return respondJSONMeta(request, response, 204);
 };
 

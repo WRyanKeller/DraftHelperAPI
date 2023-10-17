@@ -86,18 +86,27 @@ const updateTextFromJSON = (obj, id) => {
   updateText(obj.message, id);
 };
 
-const removeMon = (monElement) => {
+const removeMon = (mon, monElement) => {
+  rosterStr.replace(mon, '');
 
+  return monElement.remove();
 };
 
-const removeMonHandler = (obj, monElement) => {
-  removeMon(monElement);
+const removeMonHandler = (obj, data, response) => {
+  if (response.status !== 204) {
+    return obj;
+  }
+
+  return removeMon(data.mon, data.monElement);
 };
 
 const removeMonFromRoster = (mon, monElement) => {
-  sendPost('removeMon', `?mon=${mon}&id=${rosterId}`, [{
+  sendPost('removeMon', `mon=${mon}&id=${rosterId}`, [{
     function: removeMonHandler,
-    data: monElement,
+    data: {
+      monElement,
+      mon
+    }
   }]);
 };
 
@@ -131,10 +140,14 @@ const addMonHandler = (obj, mon, response) => {
     return obj;
   }
 
-  return addMon(mon);
+  return addMon(mon, 'rosterDisplay');
 };
 
 const updateRosterDisplay = (obj, id) => {
+  const displayId = 'rosterDisplay';
+
+  document.getElementById(displayId).innerHTML = '';
+
   if (obj.id) {
     return;
   }
@@ -144,7 +157,7 @@ const updateRosterDisplay = (obj, id) => {
   rosterId = id;
 
   obj.roster.forEach((mon) => {
-    addMon(mon, 'rosterDisplay');
+    addMon(mon, displayId);
   });
 };
 
@@ -174,7 +187,7 @@ const handleRoster = (rosterForm) => {
 
 const addMonToRoster = () => {
   const mon = document.getElementById('monInput').value;
-  sendPost('addMon', `?d=${rosterId}&mon=${mon}`, [{
+  sendPost('addMon', `id=${rosterId}&mon=${mon}`, [{
     function: addMonHandler,
     data: mon,
   }, {
