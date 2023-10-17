@@ -1,5 +1,7 @@
-let rosterStr = "";
-let rosterId = "";
+/* eslint-env browser */
+
+let rosterStr = '';
+let rosterId = '';
 
 const handleResponse = async (response, parseResponse, handlers) => {
   /*
@@ -31,43 +33,42 @@ const handleResponse = async (response, parseResponse, handlers) => {
   if (parseResponse) {
     let obj = {};
     if (response.status === 204) {
-      obj.message = 'Success - Updated'
+      obj.message = 'Success - Updated';
     } else {
       obj = await response.json();
     }
-    
+
     console.log(obj);
 
-    for (handler of handlers) {
+    handlers.forEach((handler) => {
       handler.function(obj, handler.data, response);
-    }
-  }
-  else {
-    for (handler of handlers) {
+    });
+  } else {
+    handlers.forEach((handler) => {
       handler.function(response, handler.data);
-    }
+    });
   }
 };
 
-const sendFetch = async (action, handlers, shouldParse=true, type='application/json') => {
-  let response = await fetch(action, {
+const sendFetch = async (action, handlers, shouldParse = true, type = 'application/json') => {
+  const response = await fetch(action, {
     method: 'get',
     headers: {
-      'Accept': type,
-    }
+      Accept: type,
+    },
   });
 
   handleResponse(response, shouldParse, handlers);
 };
 
 const sendPost = async (action, body, handlers) => {
-  let response = await fetch(action, {
+  const response = await fetch(action, {
     method: 'post',
     headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
-    'Accept': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
     },
-    body: body,
+    body,
   });
 
   handleResponse(response, true, handlers);
@@ -78,12 +79,12 @@ const updateText = (message, id) => {
   const responseElement = document.getElementById(id);
 
   responseElement.innerHTML = message;
-}
+};
 
 // requires string id of html element
 const updateTextFromJSON = (obj, id) => {
   updateText(obj.message, id);
-}
+};
 
 const removeMon = (monElement) => {
 
@@ -93,7 +94,14 @@ const removeMonHandler = (obj, monElement) => {
   removeMon(monElement);
 };
 
-const addMon = (mon) => {
+const removeMonFromRoster = (mon, monElement) => {
+  sendPost('removeMon', `?mon=${mon}&id=${rosterId}`, [{
+    function: removeMonHandler,
+    data: monElement,
+  }]);
+};
+
+const addMon = (mon, divId) => {
   const monElement = document.createElement('div');
   monElement.setAttribute('class', 'mon');
 
@@ -108,66 +116,72 @@ const addMon = (mon) => {
   const monDelete = document.createElement('button');
   monDelete.setAttribute('class', 'monDelete');
   monDelete.setAttribute('type', 'button');
-  monHeader.innerHTML = 'x';
-  monDelete.addEventListener('click', e => {
-    return sendPost('removeMon', `?mon=${mon}&id=${rosterId}`,
-    [{removeMonHandler}
-    ]);
-  });
+  monDelete.innerHTML = 'x';
+  monDelete.addEventListener('click', () => removeMonFromRoster(mon, monElement));
 
   monElement.appendChild(monHeader);
   monElement.appendChild(monArt);
   monElement.appendChild(monDelete);
+
+  document.getElementById(divId).appendChild(monElement);
 };
 
 const addMonHandler = (obj, mon, response) => {
-  if (response.status != 204) {
-    return;
+  if (response.status !== 204) {
+    return obj;
   }
 
   return addMon(mon);
 };
 
-const updateRoster = (obj) => {
-  let roster = '';
-  if (!(obj.roster)) {
-    rosterStr = roster;
+const updateRosterDisplay = (obj, id) => {
+  if (obj.id) {
     return;
   }
 
-  roster = JSON.stringify(obj.roster);
+  const roster = JSON.stringify(obj.roster);
+  rosterStr = roster;
+  rosterId = id;
 
-  let htmlStr = '';
-    
-  for (mon of obj.roster) {
-    htmlStr += `<h3>${mon}</h3>`;
-  }
-
-  document.getElementById('tempRoster').innerHTML = htmlStr;
-}
+  obj.roster.forEach((mon) => {
+    addMon(mon, 'rosterDisplay');
+  });
+};
 
 const handleRoster = (rosterForm) => {
   const select = rosterForm.querySelector('select');
   const action = select.options[select.selectedIndex].getAttribute('action');
   const method = select.options[select.selectedIndex].getAttribute('method');
 
-  //console.log(`action: ${action}, method: ${method}`);
-  if (method === 'get') sendFetch(action + `?id=${document.getElementById('idField').value}`, [{
+  const id = document.getElementById('idField').value;
+
+  // console.log(`action: ${action}, method: ${method}`);
+  if (method === 'get') {
+    sendFetch(`${action}?id=${id}`, [{
       function: updateTextFromJSON,
-      data: 'rosterResponse'
+      data: 'rosterResponse',
     }, {
-      function: updateRoster,
-      data: ''
+      function: updateRosterDisplay,
+      data: id,
     }]);
-  else sendPost(action, `id=${document.getElementById('idField').value}&roster=${rosterStr}`, [{
-    function: updateTextFromJSON,
-    data: 'rosterResponse'
-  }]);
+  } else {
+    sendPost(action, `id=${id}&roster=${rosterStr}`, [{
+      function: updateTextFromJSON,
+      data: 'rosterResponse',
+    }]);
+  }
 };
 
-const addMonToRoster = (monForm) => {
-
-}
+const addMonToRoster = () => {
+  const mon = document.getElementById('monInput').value;
+  sendPost('addMon', `?d=${rosterId}&mon=${mon}`, [{
+    function: addMonHandler,
+    data: mon,
+  }, {
+    function: updateTextFromJSON,
+    data: 'addResponse',
+  }]);
+};
 
 const init = () => {
   const rosterForm = document.querySelector('#rosterForm');
@@ -176,9 +190,19 @@ const init = () => {
     e.preventDefault();
     handleRoster(rosterForm);
     return false;
-  }
+  };
 
   rosterForm.addEventListener('submit', submitRosterForm);
+
+  const addForm = document.querySelector('#addMonForm');
+
+  const submitAddForm = (e) => {
+    e.preventDefault();
+    addMonToRoster();
+    return false;
+  };
+
+  addForm.addEventListener('submit', submitAddForm);
 };
 
 window.onload = init;

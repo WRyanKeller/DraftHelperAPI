@@ -5,7 +5,7 @@
   "main": "./src/server.js",
   "scripts": {
     "start": "node ./src/server.js",
-    "pretest": "eslint ./src --fix",
+    "pretest": "eslint ./client ./src --fix",
     "test": "echo \"Tests complete\"",
     "nodemon": "nodemon -e js,html,css --watch ./src --watch ./client --watch ./hosted ./src/server.js",
     "buildBundle": "webpack",

@@ -35,6 +35,9 @@ Code Fragments:
 client.js - https://www.codexworld.com/how-to/get-attribute-value-of-the-selected-option-using-javascript/
  - used to get attributes other than value from the current option of a select tag
 
+ client.js - https://eslint.org/docs/latest/use/configure/language-options
+  - used to include global variables, letting eslint tests pass
+
 -----------------------
 Endpoint Documentation:
 -----------------------

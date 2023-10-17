@@ -26,6 +26,19 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
+const notFound = (request, response) => {
+  const responseJSON = {
+    message: 'The page you are looking for was not found.',
+    id: 'notFound',
+  };
+
+  respondJSON(request, response, 404, responseJSON);
+};
+
+const notFoundMeta = (request, response) => {
+  respondJSONMeta(request, response, 404);
+};
+
 const getRoster = (request, response, params) => {
   const responseJSON = {
     roster: rosters[params.id],
@@ -42,7 +55,13 @@ const getRoster = (request, response, params) => {
   return respondJSON(request, response, 200, responseJSON);
 };
 
-const getRosterMeta = (request, response) => respondJSONMeta(request, response, 200);
+const getRosterMeta = (request, response, params) => {
+  if (rosters[params.id]) {
+    return respondJSONMeta(request, response, 200);
+  }
+
+  return notFoundMeta(request, response);
+};
 
 const addMonToRoster = (request, response, body) => {
   const monResponse = rosterAnalysis.validateMon(body.mon);
@@ -141,19 +160,6 @@ const removeMonFromRoster = (request, response, body) => {
   }
 
   return respondJSONMeta(request, response, 204);
-};
-
-const notFound = (request, response) => {
-  const responseJSON = {
-    message: 'The page you are looking for was not found.',
-    id: 'notFound',
-  };
-
-  respondJSON(request, response, 404, responseJSON);
-};
-
-const notFoundMeta = (request, response) => {
-  respondJSONMeta(request, response, 404);
 };
 
 module.exports = {
