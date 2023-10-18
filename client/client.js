@@ -240,7 +240,6 @@ const handleRoster = (rosterForm) => {
       function: updateRosterDisplay,
       data: id,
     }]);
-
   } else { // post case
     // handlers are updating roster response text and setting current roster
     sendPost(action, `id=${id}&roster=${rosterStr}`, [{

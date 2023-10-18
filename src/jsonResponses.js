@@ -141,7 +141,7 @@ const addMonToRoster = (request, response, body) => {
 
 /*
 Summary:
-- the second half of adding a roster - 
+- the second half of adding a roster -
 - determining if the roster is created or updated
 */
 const addRosterSuccess = (request, response, body) => {
@@ -159,7 +159,7 @@ const addRosterSuccess = (request, response, body) => {
 
 /*
 Summary:
-- the first hald of adding a roster - 
+- the first hald of adding a roster -
 - validates mons, checks for bad requests, etc.
 */
 const addRoster = (request, response, body) => {

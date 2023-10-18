@@ -1,5 +1,21 @@
+body {
+    background-color:beige;
+}
+
 header {
     text-align: center;
+    background-color:aquamarine;
+}
+
+h1 {
+    font-size: 6em;
+    font-family:Verdana, Geneva, Tahoma, sans-serif
+}
+
+@media screen and (max-width: 1260px) {
+    h1 {
+        font-size: 4.5em;
+    }
 }
 
 .mon {
