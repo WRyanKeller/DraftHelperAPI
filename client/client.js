@@ -1,55 +1,45 @@
 /* eslint-env browser */
+// above line acquired from https://eslint.org/docs/latest/use/configure/language-options
 
+// state needed to track roster contents
+// and roster id
 let rosterStr = '';
 let rosterId = '';
 
+/*
+Summary:
+- all purpose response handler for json
+- can choose not to parse response
+- accepts handler array of handler objects:
+  - function and accompanying data
+*/
 const handleResponse = async (response, parseResponse, handlers) => {
-  /*
-  switch(response.status) {
-    case 200: //success
-      rosterResponse.innerHTML = `<b>Success</b>`;
-      break;
-    case 201: //created
-      rosterResponse.innerHTML = '<b>Created</b>';
-      break;
-    case 204: //updated (no response back from server)
-      rosterResponse.innerHTML = '<b>Updated</b>';
-      return; // won't hit the parse
-    case 400: //bad request
-      rosterResponse.innerHTML = `<b>Bad Request</b>`;
-      break;
-    case 404: //not found
-      rosterResponse.innerHTML = `<b>Not Found</b>`;
-      break;
-    case 500: //uh oh
-      rosterResponse.innerHTML = `<b>Internal Server Error</b>`;
-      break;
-    default: //any other status code
-      rosterResponse.innerHTML = `Error code not implemented by client.`;
-      break;
-  }
-  */
-
   if (parseResponse) {
     let obj = {};
+
+    // adds message for update code
     if (response.status === 204) {
       obj.message = 'Success - Updated';
     } else {
       obj = await response.json();
     }
 
-    console.log(obj);
-
     handlers.forEach((handler) => {
       handler.function(obj, handler.data, response);
     });
-  } else {
+  } else { // don't parse!
     handlers.forEach((handler) => {
       handler.function(response, handler.data);
     });
   }
 };
 
+/*
+Summary:
+- all purpose fetch for get and head requests
+- accepts handlers for handling response
+- allows for different type (not needed curently, but nice to have)
+*/
 const sendFetch = async (action, handlers, shouldParse = true, type = 'application/json') => {
   const response = await fetch(action, {
     method: 'get',
@@ -61,6 +51,12 @@ const sendFetch = async (action, handlers, shouldParse = true, type = 'applicati
   handleResponse(response, shouldParse, handlers);
 };
 
+/*
+Summary:
+- json-purpose fetch for posting
+- sends body in url query format
+- accepts handlers for handling response
+*/
 const sendPost = async (action, body, handlers) => {
   const response = await fetch(action, {
     method: 'post',
@@ -82,16 +78,36 @@ const updateText = (message, id) => {
 };
 
 // requires string id of html element
+// used after parsing response
 const updateTextFromJSON = (obj, id) => {
   updateText(obj.message, id);
 };
 
+/*
+Summary:
+- update global roster id as handler function
+*/
+const setRosterID = (obj, id) => {
+  rosterId = id;
+  return obj;
+};
+
+/*
+Summary:
+- straight up removes the .mon container element provided
+- and deletes the mon from the roster string
+*/
 const removeMon = (mon, monElement) => {
   rosterStr.replace(mon, '');
 
   return monElement.remove();
 };
 
+/*
+Summary:
+- Removes the element as a handler
+- requires data to hold both the mon name and the .mon conatiner element
+*/
 const removeMonHandler = (obj, data, response) => {
   if (response.status !== 204) {
     return obj;
@@ -100,16 +116,42 @@ const removeMonHandler = (obj, data, response) => {
   return removeMon(data.mon, data.monElement);
 };
 
+/*
+Summary:
+- calls the post request with removeMonHandler as the handler function
+*/
 const removeMonFromRoster = (mon, monElement) => {
   sendPost('removeMon', `mon=${mon}&id=${rosterId}`, [{
     function: removeMonHandler,
     data: {
       monElement,
-      mon
-    }
+      mon,
+    },
   }]);
 };
 
+/*
+Summary:
+- A handler function to take in an html element and add a url for a new resource into its src
+- the resource comes from a provided url
+- code largely worked from https://stackoverflow.com/questions/47001306/display-png-from-http-get-request
+*/
+const updateImg = (obj, element) => {
+  if (!obj.url) return;
+
+  fetch(obj.url).then((response) => response.blob()).then((blob) => {
+    const img = URL.createObjectURL(blob);
+    element.setAttribute('src', img);
+  });
+};
+
+/*
+Summary:
+- creates container alongside children:
+  - header
+  - image
+  - delete button
+*/
 const addMon = (mon, divId) => {
   const monElement = document.createElement('div');
   monElement.setAttribute('class', 'mon');
@@ -118,9 +160,16 @@ const addMon = (mon, divId) => {
   monHeader.setAttribute('class', 'monHeader');
   monHeader.innerHTML = mon;
 
-  const monArt = document.createElement('image');
-  monArt.setAttribute('src', `getArt?mon=${mon}`);
+  const monArt = document.createElement('img');
   monArt.setAttribute('alt', `Art of ${mon}`);
+  monArt.setAttribute('height', '95px');
+  monArt.setAttribute('width', '95px');
+  sendFetch(`getArt?mon=${mon}`, [
+    {
+      function: updateImg,
+      data: monArt,
+    },
+  ]);
 
   const monDelete = document.createElement('button');
   monDelete.setAttribute('class', 'monDelete');
@@ -135,6 +184,10 @@ const addMon = (mon, divId) => {
   document.getElementById(divId).appendChild(monElement);
 };
 
+/*
+Summary:
+- calls add mon as a handler function
+*/
 const addMonHandler = (obj, mon, response) => {
   if (response.status !== 204) {
     return obj;
@@ -143,6 +196,10 @@ const addMonHandler = (obj, mon, response) => {
   return addMon(mon, 'rosterDisplay');
 };
 
+/*
+Summary:
+- updates the roster display element by adding each mon in the roster
+*/
 const updateRosterDisplay = (obj, id) => {
   const displayId = 'rosterDisplay';
 
@@ -161,6 +218,11 @@ const updateRosterDisplay = (obj, id) => {
   });
 };
 
+/*
+Summary:
+- handles the click of the roster form - saving or loading!
+- getting attributes of options with code from https://www.codexworld.com/how-to/get-attribute-value-of-the-selected-option-using-javascript/
+*/
 const handleRoster = (rosterForm) => {
   const select = rosterForm.querySelector('select');
   const action = select.options[select.selectedIndex].getAttribute('action');
@@ -168,8 +230,9 @@ const handleRoster = (rosterForm) => {
 
   const id = document.getElementById('idField').value;
 
-  // console.log(`action: ${action}, method: ${method}`);
+  // get case
   if (method === 'get') {
+    // handlers are updating mons on display and updating roster response text
     sendFetch(`${action}?id=${id}`, [{
       function: updateTextFromJSON,
       data: 'rosterResponse',
@@ -177,14 +240,24 @@ const handleRoster = (rosterForm) => {
       function: updateRosterDisplay,
       data: id,
     }]);
-  } else {
+
+  } else { // post case
+    // handlers are updating roster response text and setting current roster
     sendPost(action, `id=${id}&roster=${rosterStr}`, [{
       function: updateTextFromJSON,
       data: 'rosterResponse',
+    }, {
+      function: setRosterID,
+      data: id,
     }]);
   }
 };
 
+/*
+Summary:
+- calls post for adding a mon
+  - handlers are adding a mon as a handler and updating add text
+*/
 const addMonToRoster = () => {
   const mon = document.getElementById('monInput').value;
   sendPost('addMon', `id=${rosterId}&mon=${mon}`, [{
@@ -196,6 +269,11 @@ const addMonToRoster = () => {
   }]);
 };
 
+/*
+Summary:
+- called at onload
+- adds event listeners to buttons
+*/
 const init = () => {
   const rosterForm = document.querySelector('#rosterForm');
 

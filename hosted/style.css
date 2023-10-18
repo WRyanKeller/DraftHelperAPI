@@ -2,26 +2,29 @@ header {
     text-align: center;
 }
 
-/*
 .mon {
     display: grid;
-    grid-template-columns: 475px 40px;
-    grid-template-rows: auto 475px;
-    grid-template-areas: 
+    grid-template-columns: 95px 200px 30px;
+    grid-template-rows: 30px 65px;
+    /* grid-template-areas: 
         "title" "delete"
-        "image" "delete";
+        "image" "delete"; */
 }
 
 .monHeader {
-    grid-area: title;
+    grid-area: 1 / 2 / span 1 / span 1;
 }
 
 .monArt {
-    grid-area: image;
+    grid-area: 1 / 1 / span 2 / span 1;
 }
 
 .monDelete {
-    grid-area: delete;
+    grid-area: 1 / 3 / span 2 / span 1;
     align-self: center;
 }
-*/
+
+hr {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}

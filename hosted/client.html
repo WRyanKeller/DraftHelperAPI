@@ -11,30 +11,30 @@
     <h1>Draft Helper API</h1>
   </header>
 
-  <div id="input">
-    <form id="rosterForm">
-      <label for="rosterID">Roster ID: </label>
-      <input id="idField" type="text" name="rosterID"/>
-      <select id="methodSelect">
-        <option action="/getRoster" method="get">Load</option>
-        <option action="/addRoster" method="post">Save</option>
-      </select>
-      <input type="submit" value="Submit"/>
-    </form>
-    <p id="rosterResponse"></p>
-  </div>
-
-  <br>
-
   <div id="roster">
     <h2>Roster:</h2>
-    <p id="rosterDisplay"></p>
+    <div id="rosterDisplay"></div>
     <form id="addMonForm">
       <label for="newMonName">Add Pokemon: </label>
       <input id="monInput" type="text" name="newMonName"/>
       <input type="submit" value="Add"/>
     </form>
     <p id="addResponse"></p>
+  </div>
+
+  <hr>
+
+  <div id="input">
+    <form id="rosterForm">
+      <label for="rosterID">Roster ID: </label>
+      <input id="idField" type="text" name="rosterID"/>
+      <select id="methodSelect">
+        <option action="/addRoster" method="post">Save</option>
+        <option action="/getRoster" method="get">Load</option>
+      </select>
+      <input type="submit" value="Submit"/>
+    </form>
+    <p id="rosterResponse"></p>
   </div>
 
   <div id="conerns"></div>

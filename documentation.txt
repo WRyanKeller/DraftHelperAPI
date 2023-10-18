@@ -38,6 +38,9 @@ client.js - https://www.codexworld.com/how-to/get-attribute-value-of-the-selecte
  client.js - https://eslint.org/docs/latest/use/configure/language-options
   - used to include global variables, letting eslint tests pass
 
+client.js - https://stackoverflow.com/questions/47001306/display-png-from-http-get-request
+ - used to fetch and display an image
+
 -----------------------
 Endpoint Documentation:
 -----------------------

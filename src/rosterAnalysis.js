@@ -1,5 +1,9 @@
 const apiURL = 'https://pokeapi.co/api/v2/';
 
+/*
+Summary:
+- requests a pokemon from the pokemon api
+*/
 const getMon = async (mon) => {
   const monResult = await fetch(`${apiURL}pokemon/${mon}`, {
     method: 'get',
@@ -12,13 +16,17 @@ const getMon = async (mon) => {
 
   try {
     monResponse = await monResult.json();
-  } catch {
+  } catch (e) {
     monResponse = `${mon} does not exist or is in the wrong format!`;
   }
 
   return monResponse;
 };
 
+/*
+Summary:
+- deciphers result of validation for one mon
+*/
 const validateMon = async (mon) => {
   const returnObj = {
     pass: true,
@@ -35,6 +43,11 @@ const validateMon = async (mon) => {
   return returnObj;
 };
 
+/*
+Summary:
+- deciphers result of validations for multiple mons
+- sent in as one roster array
+*/
 const validateRoster = async (roster) => {
   const monPromises = [];
   const returnObj = {
@@ -47,7 +60,6 @@ const validateRoster = async (roster) => {
 
     monResult.then((response) => {
       if (!response.abilities && returnObj.pass) {
-        console.log(response.abilities);
         returnObj.pass = false;
         returnObj.message = response;
       }
@@ -61,7 +73,22 @@ const validateRoster = async (roster) => {
   return returnObj;
 };
 
+/*
+Summary:
+- returns the url for a mon
+*/
+const getArt = async (mon) => {
+  const monResponse = await getMon(mon);
+
+  if (!monResponse.sprites) {
+    return '';
+  }
+
+  return monResponse.sprites.other['official-artwork'].front_default;
+};
+
 module.exports = {
   validateRoster,
   validateMon,
+  getArt,
 };

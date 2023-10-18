@@ -1,5 +1,9 @@
 const rosterAnalysis = require('./rosterAnalysis.js');
 
+/*
+Summary:
+- basically the entire list of rosters that exist (until I move it elsewhere)
+*/
 const rosters = {
   sarah_rc: ['genesect',
     'rotom-wash',
@@ -7,6 +11,10 @@ const rosters = {
   ],
 };
 
+/*
+Summary:
+- basic json response
+*/
 const respondJSON = (request, response, status, object) => {
   const headers = {
     'Content-Type': 'application/json',
@@ -17,6 +25,7 @@ const respondJSON = (request, response, status, object) => {
   response.end();
 };
 
+// basic json response no body
 const respondJSONMeta = (request, response, status) => {
   const headers = {
     'Content-Type': 'application/json',
@@ -26,36 +35,56 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
+/*
+Summary:
+- calls respond JSON with not found object and status
+*/
 const notFound = (request, response) => {
   const responseJSON = {
-    message: 'The page you are looking for was not found.',
+    message: 'The page or resource you are looking for was not found.',
     id: 'notFound',
   };
 
   respondJSON(request, response, 404, responseJSON);
 };
 
+// not found with no body
 const notFoundMeta = (request, response) => {
   respondJSONMeta(request, response, 404);
 };
 
+/*
+Summary:
+- requests a roster from the rosters object
+*/
 const getRoster = (request, response, params) => {
   const responseJSON = {
-    roster: rosters[params.id],
+    roster: [],
     message: 'Success - Roster Loaded',
   };
 
-  if (!responseJSON.roster) {
-    responseJSON.roster = [];
+  if (!params.id) {
+    responseJSON.message = 'Must specify roster!';
+    responseJSON.id = 'noRoster';
+    return respondJSONMeta(request, response, 400);
+  }
+
+  if (!rosters[params.id]) {
     responseJSON.message = 'No roster exists with that ID!';
     responseJSON.id = 'rosterNotFound';
     return respondJSON(request, response, 404, responseJSON);
   }
 
+  responseJSON.roster = rosters[params.id];
   return respondJSON(request, response, 200, responseJSON);
 };
 
+// get roster with no body
 const getRosterMeta = (request, response, params) => {
+  if (!params.id) {
+    return respondJSONMeta(request, response, 400);
+  }
+
   if (rosters[params.id]) {
     return respondJSONMeta(request, response, 200);
   }
@@ -63,7 +92,20 @@ const getRosterMeta = (request, response, params) => {
   return notFoundMeta(request, response);
 };
 
+/*
+Summary:
+- checks for a valid pokemon
+- attempts an addition to a roster
+- allows adding to a new roster
+*/
 const addMonToRoster = (request, response, body) => {
+  if (!body.id || !body.mon) {
+    return respondJSON(request, response, 400, {
+      message: 'Must specify roster and mon!',
+      id: 'noRosterOrMon',
+    });
+  }
+
   const monResponse = rosterAnalysis.validateMon(body.mon);
 
   monResponse.then((monValid) => {
@@ -97,6 +139,11 @@ const addMonToRoster = (request, response, body) => {
   return monResponse;
 };
 
+/*
+Summary:
+- the second half of adding a roster - 
+- determining if the roster is created or updated
+*/
 const addRosterSuccess = (request, response, body) => {
   if (rosters[body.id]) {
     rosters[body.id] = body.roster;
@@ -110,7 +157,19 @@ const addRosterSuccess = (request, response, body) => {
   return respondJSON(request, response, 201, responseJSON);
 };
 
+/*
+Summary:
+- the first hald of adding a roster - 
+- validates mons, checks for bad requests, etc.
+*/
 const addRoster = (request, response, body) => {
+  if (!body.id || !('roster' in body)) {
+    return respondJSON(request, response, 400, {
+      message: 'Must specify roster and mons!',
+      id: 'noRosterOrMons',
+    });
+  }
+
   if (body.id && !body.roster) {
     const newBody = {
       id: body.id,
@@ -143,11 +202,21 @@ const addRoster = (request, response, body) => {
   return rosterResponse;
 };
 
+/*
+Summary:
+- attempts removal of one specific mon from a roster
+- checks for bad requests - from missing params to the roster not containing the mon
+*/
 const removeMonFromRoster = (request, response, body) => {
   const responseJSON = {
     message: `${body.mon} not found in roster!`,
-    id: 'monNotFoundInRoster',
   };
+
+  if (!body.id || !body.mon) {
+    responseJSON.message = 'Must specify roster and mon!';
+    responseJSON.id = 'noRosterOrMon';
+    return respondJSON(request, response, 400, responseJSON);
+  }
 
   if (!rosters[body.id]) {
     responseJSON.message = 'Roster not found!';
@@ -155,14 +224,58 @@ const removeMonFromRoster = (request, response, body) => {
     return respondJSON(request, response, 404, responseJSON);
   }
 
-  let index = rosters[body.id].indexOf(body.mon);
+  const index = rosters[body.id].indexOf(body.mon);
 
   if (index === -1) {
+    responseJSON.id = 'monNotFoundInRoster';
     return respondJSON(request, response, 404, responseJSON);
   }
 
   rosters[body.id].splice(index, 1);
   return respondJSONMeta(request, response, 204);
+};
+
+/*
+Summary:
+- handles requesting art from roster analysis in the form of a url
+*/
+const getArt = (request, response, params) => {
+  const responseJSON = {};
+
+  if (!params.mon) {
+    responseJSON.message = `${params.mon} is required!`;
+    responseJSON.id = 'monNameNeededForArt';
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  const spriteResult = rosterAnalysis.getArt(params.mon);
+
+  return spriteResult.then((monSprite) => {
+    if (!monSprite) {
+      return notFound(request, response);
+    }
+
+    responseJSON.url = monSprite;
+    responseJSON.message = 'sprite successfully retreived';
+    return respondJSON(request, response, 200, responseJSON);
+  });
+};
+
+// get art with no body
+const getArtMeta = (request, response, params) => {
+  if (!params.mon) {
+    return respondJSONMeta(request, response, 400);
+  }
+
+  const spriteResult = rosterAnalysis.getArt(params.mon);
+
+  return spriteResult.then((monSprite) => {
+    if (!monSprite) {
+      return notFoundMeta(request, response);
+    }
+
+    return respondJSONMeta(request, response, 200);
+  });
 };
 
 module.exports = {
@@ -173,4 +286,6 @@ module.exports = {
   removeMon: removeMonFromRoster,
   notFound,
   notFoundMeta,
+  getArt,
+  getArtMeta,
 };

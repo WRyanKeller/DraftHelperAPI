@@ -6,16 +6,22 @@ const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
+/*
+Summary:
+- routes urls to their desired actions
+*/
 const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getCSS,
     '/bundle.js': htmlHandler.getBundle,
     '/getRoster': jsonHandler.getRoster,
+    '/getArt': jsonHandler.getArt,
     notFound: jsonHandler.notFound,
   },
   HEAD: {
     '/getRoster': jsonHandler.getRosterMeta,
+    '/getArt': jsonHandler.getArtMeta,
     notFound: jsonHandler.notFoundMeta,
   },
   POST: {
@@ -26,6 +32,10 @@ const urlStruct = {
   },
 };
 
+/*
+Summary:
+- parses data provided by post requests
+*/
 const parseBody = (request, response, handler) => {
   request.on('error', (err) => {
     console.dir(err);
@@ -50,6 +60,10 @@ const parseBody = (request, response, handler) => {
   });
 };
 
+/*
+Summary:
+- handles posts requests by looking for their handler and then passing them to parse body
+*/
 const handlePost = (request, response, parsedUrl) => {
   if (urlStruct.POST[parsedUrl.pathname]) {
     return parseBody(request, response, urlStruct.POST[parsedUrl.pathname]);
@@ -58,6 +72,10 @@ const handlePost = (request, response, parsedUrl) => {
   return urlStruct.POST.notFound(request, response);
 };
 
+/*
+Summary:
+- handles get and head requests by routing them to their handlers
+*/
 const handleGet = (request, response, parsedUrl, params) => {
   if (urlStruct[request.method][parsedUrl.pathname]) {
     return urlStruct[request.method][parsedUrl.pathname](request, response, params);
@@ -66,9 +84,13 @@ const handleGet = (request, response, parsedUrl, params) => {
   return urlStruct[request.method].notFound(request, response, params);
 };
 
+/*
+Summary:
+- called upon receiving a request to the server
+- differentiates between get and post calls
+*/
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
-  console.log(request.url);
 
   if (request.method === 'POST') {
     return handlePost(request, response, parsedUrl);
@@ -79,7 +101,6 @@ const onRequest = (request, response) => {
   }
 
   const params = query.parse(parsedUrl.query);
-  console.dir(params);
   return handleGet(request, response, parsedUrl, params);
 };
 
